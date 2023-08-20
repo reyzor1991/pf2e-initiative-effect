@@ -1,0 +1,47 @@
+{
+  "id": "pf2e-initiative-effect",
+  "title": "PF2e Initiative Effect",
+  "description": "PF2e module - add effect when roll 20 or 1",
+  "version": "0.0.2",
+  "authors": [
+    {
+      "name": "Reyzor",
+      "url": "https://github.com/reyzor1991",
+      "discord": "reyzor1991"
+    }
+  ],
+  "languages": [],
+  "esmodules": [
+    "pf2e-initiative-effect.js"
+  ],
+  "styles": [],
+  "packs": [
+    {
+      "label": "Initiative Effect",
+      "name": "initiative-effect",
+      "path": "packs/initiative-effect.db",
+      "system": "pf2e",
+      "private": false,
+      "type": "Item",
+      "flags": {}
+    }
+  ],
+  "media": [],
+  "compatibility": {
+    "minimum": "11",
+    "verified": "11.307"
+  },
+  "relationships": {
+    "systems": [
+      {
+        "id": "pf2e",
+        "type": "system",
+        "manifest": "https://github.com/foundryvtt/pf2e/releases/latest/download/system.json",
+        "compatibility": {
+          "minimum": "5.0.2",
+          "verified": "5.3.1"
+        }
+      }
+    ]
+  }
+}
