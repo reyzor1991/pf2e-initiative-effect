@@ -28,7 +28,7 @@ async function setRoll1(actor, eff) {
     source.flags = mergeObject(source.flags ?? {}, { core: { sourceId: eff } });
     source.system.start.initiative = null;
     const qq = hasConditionBySourceId(actor, source.system.rules[0].uuid)
-    if (qq) {
+    if (qq && eff === "Compendium.pf2e-initiative-effect.initiative-effect.Item.F7vCiGa2Bt04zPz7") {
         source.system.rules[0].alterations[0].value = qq.system.value.value + 1;
     }
 
