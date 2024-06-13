@@ -2,7 +2,7 @@
   "id": "pf2e-initiative-effect",
   "title": "PF2e Initiative Effect",
   "description": "PF2e module - add effect when roll 20 or 1",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "authors": [
     {
       "name": "Reyzor",
@@ -31,7 +31,7 @@
   "download": "https://github.com/reyzor1991/pf2e-initiative-effect/releases/latest/download/pf2e-initiative-effect.zip",
   "compatibility": {
     "minimum": "11",
-    "verified": "11.308"
+    "verified": "12.327"
   },
   "relationships": {
     "systems": [
@@ -41,7 +41,7 @@
         "manifest": "https://github.com/foundryvtt/pf2e/releases/latest/download/system.json",
         "compatibility": {
           "minimum": "5.0.2",
-          "verified": "5.3.1"
+          "verified": "6.0.1"
         }
       }
     ]
