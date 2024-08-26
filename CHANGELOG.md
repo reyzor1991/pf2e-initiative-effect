@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.1.1
+- Optimization
+
 ## Version 0.1.0
 - v12 compatibility
 

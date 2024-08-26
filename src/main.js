@@ -18,51 +18,32 @@ Hooks.once("init", () => {
     });
 });
 
-function hasConditionBySourceId(actor, eff) {
-    return actor?.itemTypes?.condition?.find((c => eff === c.sourceId))
-}
-
-async function setRoll1(actor, eff) {
+async function setRollEffect(actor, eff) {
     let source = await fromUuid(eff);
     source = source.toObject();
-    source.flags = mergeObject(source.flags ?? {}, { core: { sourceId: eff } });
+    source.flags = mergeObject(source.flags ?? {}, {core: {sourceId: eff}});
     source.system.start.initiative = null;
-    const qq = hasConditionBySourceId(actor, source.system.rules[0].uuid)
-    if (qq && eff === "Compendium.pf2e-initiative-effect.initiative-effect.Item.F7vCiGa2Bt04zPz7") {
-        source.system.rules[0].alterations[0].value = qq.system.value.value + 1;
+
+    await actor.createEmbeddedDocuments("Item", [source]);
+}
+
+Hooks.on('preCreateChatMessage', async (message, user, _options) => {
+    if (!message?.flags?.core?.initiativeRoll) {
+        return;
     }
-
-    createEffectForActor(actor, source);
-}
-
-async function setRoll20(actor, eff) {
-    let source = await fromUuid(eff);
-    source = source.toObject();
-    source.flags = mergeObject(source.flags ?? {}, { core: { sourceId: eff } });
-    source.system.start.initiative = null;
-
-    createEffectForActor(actor, source);
-}
-
-async function createEffectForActor(actor, effect) {
-    await actor.createEmbeddedDocuments("Item", [effect]);
-}
-
-Hooks.on('preCreateChatMessage', async (message, user, _options, userId)=>{
-    if (!message?.flags?.core?.initiativeRoll) {return;}
     const total = message?.rolls?.[0]?.dice?.[0].total;
     if (20 === total) {
         const r20 = game.settings.get(moduleName, "roll20");
         if (r20) {
-            setTimeout(function() {
-                setRoll20(message.actor, r20);
+            setTimeout(function () {
+                setRollEffect(message.actor, r20);
             }, 500);
         }
     } else if (1 === total) {
         const r1 = game.settings.get(moduleName, "roll1");
         if (r1) {
-            setTimeout(function() {
-                setRoll20(message.actor, r1);
+            setTimeout(function () {
+                setRollEffect(message.actor, r1);
             }, 500);
         }
     }
