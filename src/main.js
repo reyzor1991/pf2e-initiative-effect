@@ -16,10 +16,26 @@ Hooks.once("init", () => {
         default: "Compendium.pf2e-initiative-effect.initiative-effect.Item.F7vCiGa2Bt04zPz7",
         type: String,
     });
+
+    game.settings.register(moduleName, "initType", {
+        name: "Select type of reward/penalty",
+        scope: "world",
+        config: true,
+        type: String,
+        choices: {
+            'effect': 'Apply effects',
+            'heroReward': 'Add hero points/no penalty',
+            'heroAll': 'Add hero points/effect penalty',
+        },
+        default: "effect",
+    });
 });
 
 async function setRollEffect(actor, eff) {
     let source = await fromUuid(eff);
+    if (!source) {
+        return;
+    }
     source = source.toObject();
     source.flags = mergeObject(source.flags ?? {}, {core: {sourceId: eff}});
     source.system.start.initiative = null;
@@ -27,24 +43,46 @@ async function setRollEffect(actor, eff) {
     await actor.createEmbeddedDocuments("Item", [source]);
 }
 
+function changeHeroPoints(actor, delta) {
+    const heroPointCount = actor.heroPoints.value;
+    actor.update({
+        "system.resources.heroPoints.value": Math.clamp(
+            heroPointCount + delta,
+            0,
+            actor.heroPoints.max,
+        ),
+    });
+    ui.notifications.info(`${actor.name} get hero point`);
+}
+
+function handle20(message, type) {
+    if ("heroReward" === type || "heroAll" === type) {
+        changeHeroPoints(message.actor, 1)
+    } else if ("effect" === type) {
+        const r20 = game.settings.get(moduleName, "roll20");
+        setRollEffect(message.actor, r20);
+    }
+}
+
+function handle1(message, type) {
+    if ("effect" === type || "heroAll" === type) {
+        const r1 = game.settings.get(moduleName, "roll1");
+        setRollEffect(message.actor, r1);
+    }
+}
+
 Hooks.on('preCreateChatMessage', async (message, user, _options) => {
     if (!message?.flags?.core?.initiativeRoll) {
         return;
     }
+    const type = game.settings.get(moduleName, "initType");
     const total = message?.rolls?.[0]?.dice?.[0].total;
-    if (20 === total) {
-        const r20 = game.settings.get(moduleName, "roll20");
-        if (r20) {
-            setTimeout(function () {
-                setRollEffect(message.actor, r20);
-            }, 500);
-        }
-    } else if (1 === total) {
-        const r1 = game.settings.get(moduleName, "roll1");
-        if (r1) {
-            setTimeout(function () {
-                setRollEffect(message.actor, r1);
-            }, 500);
-        }
+    let is20 = 20 === total;
+    let is1 = 1 === total;
+
+    if (is20) {
+        handle20(message, type);
+    } else if (is1) {
+        handle1(message, type);
     }
 });

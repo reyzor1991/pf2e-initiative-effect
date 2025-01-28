@@ -1,4 +1,5 @@
-# Changelog
+## Version 0.2.0
+- Add type of rewards/penalties
 
 ## Version 0.1.1
 - Optimization
