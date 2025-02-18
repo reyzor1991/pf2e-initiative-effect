@@ -24,8 +24,9 @@ Hooks.once("init", () => {
         type: String,
         choices: {
             'effect': 'Apply effects',
-            'heroReward': 'Add hero points/no penalty',
-            'heroAll': 'Add hero points/effect penalty',
+            'heroReward': 'Add hero points / no penalty',
+            'heroParty': 'Add hero points to all party members / no penalty',
+            'heroAll': 'Add hero points / effect penalty',
         },
         default: "effect",
     });
@@ -56,11 +57,26 @@ function changeHeroPoints(actor, delta) {
 }
 
 function handle20(message, type) {
-    if ("heroReward" === type || "heroAll" === type) {
-        changeHeroPoints(message.actor, 1)
-    } else if ("effect" === type) {
-        const r20 = game.settings.get(moduleName, "roll20");
-        setRollEffect(message.actor, r20);
+    switch (type) {
+        case "heroParty":
+            let pMembers = [...message.actor.parties.map(p=>p.members)].flat()
+            if (!pMembers.length) {
+                pMembers = [message.actor];
+            }
+            pMembers.forEach(pMember => {
+                changeHeroPoints(pMember, 1)
+            })
+            break;
+        case "heroReward":
+        case "heroAll":
+            changeHeroPoints(message.actor, 1)
+            break;
+        case "effect":
+            const r20 = game.settings.get(moduleName, "roll20");
+            setRollEffect(message.actor, r20);
+            break;
+        default:
+            break;
     }
 }
 
