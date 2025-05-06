@@ -38,7 +38,7 @@ async function setRollEffect(actor, eff) {
         return;
     }
     source = source.toObject();
-    source.flags = mergeObject(source.flags ?? {}, {core: {sourceId: eff}});
+    source.flags = foundry.utils.mergeObject(source.flags ?? {}, {core: {sourceId: eff}});
     source.system.start.initiative = null;
 
     await actor.createEmbeddedDocuments("Item", [source]);

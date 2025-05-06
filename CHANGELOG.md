@@ -1,3 +1,6 @@
+## Version 0.3.0
+- Add type of rewards
+
 ## Version 0.2.1
 - Add type of rewards
 
