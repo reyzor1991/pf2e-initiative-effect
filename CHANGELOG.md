@@ -1,3 +1,6 @@
+## Version 0.3.1
+- Add fix for actor updating 
+
 ## Version 0.3.0
 - Add type of rewards
 

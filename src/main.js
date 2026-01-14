@@ -1,4 +1,6 @@
 const moduleName = "pf2e-initiative-effect";
+const SOCKET_NAME = `module.${moduleName}`;
+const UPDATE_ACTOR_SOCKET = "updateItem";
 
 Hooks.once("init", () => {
     game.settings.register(moduleName, "roll20", {
@@ -45,6 +47,13 @@ async function setRollEffect(actor, eff) {
 }
 
 function changeHeroPoints(actor, delta) {
+    if (!actor.canUserModify(game.user, "update")) {
+        executeAsGM(UPDATE_ACTOR_SOCKET, {
+            actorId: actor.uuid, data: delta
+        });
+        return
+    }
+
     const heroPointCount = actor.heroPoints.value;
     actor.update({
         "system.resources.heroPoints.value": Math.clamp(
@@ -59,7 +68,7 @@ function changeHeroPoints(actor, delta) {
 function handle20(message, type) {
     switch (type) {
         case "heroParty":
-            let pMembers = [...message.actor.parties.map(p=>p.members)].flat()
+            let pMembers = [...message.actor.parties.map(p => p.members)].flat()
             if (!pMembers.length) {
                 pMembers = [message.actor];
             }
@@ -101,4 +110,21 @@ Hooks.on('preCreateChatMessage', async (message, user, _options) => {
     } else if (is1) {
         handle1(message, type);
     }
+});
+
+function executeAsGM(type, payload) {
+    game.socket.emit(SOCKET_NAME, {type, payload});
+}
+
+Hooks.on("ready", () => {
+    game.socket.on(SOCKET_NAME, async ({type, payload}) => {
+        if (game.user !== game.users.activeGM) {
+            return;
+        }
+        switch (type) {
+            case UPDATE_ACTOR_SOCKET:
+                changeHeroPoints(await fromUuid(payload.actorId), payload.data)
+                break
+        }
+    })
 });
